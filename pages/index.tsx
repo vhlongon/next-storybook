@@ -1,20 +1,20 @@
-import type { NextPage } from 'next';
+import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useEffect } from 'react';
 import styles from '../styles/Home.module.css';
 
-const getDataFromApi = async (): Promise<string> => {
+const getDataFromApi = async (): Promise<{ name: string }> => {
   // use the next api as an example
   const response = await fetch('http://localhost:3000/api/hello');
   const data = await response.json();
   return data;
 };
-const Home: NextPage<{ name?: string }> = ({ name }) => {
-  useEffect(() => {
-    getDataFromApi().then(console.log);
-  }, []);
 
+const Home: NextPage<{ name?: string; title?: string }> = ({
+  name,
+  title = 'Welcome to',
+}) => {
   return (
     <div className={styles.container}>
       <Head>
@@ -25,7 +25,7 @@ const Home: NextPage<{ name?: string }> = ({ name }) => {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js! - {name}</a>
+          {title} <a href="https://nextjs.org">Next.js! - {name}</a>
         </h1>
 
         <p className={styles.description}>
@@ -75,6 +75,11 @@ const Home: NextPage<{ name?: string }> = ({ name }) => {
       </footer>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async context => {
+  const data = await getDataFromApi();
+  return { props: { name: data.name } };
 };
 
 export default Home;
